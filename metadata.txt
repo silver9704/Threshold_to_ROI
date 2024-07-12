@@ -1,0 +1,47 @@
+# This file contains metadata for your plugin.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Threshold to ROI
+qgisMinimumVersion=3.8
+description=Create ROI (Region of Interest) with threshold values.
+version=1.0
+author=Silver Piedra
+email=silverpiedraherrera@gmail.com
+
+about=This plugin allows you to create an ROI (Region of Interest) with selected threshold values ​​from the histogram of a raster layer.
+
+tracker=http://bugs
+repository=http://repo
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+changelog=0.9.0
+- Easy and intuitive user interface implementation.
+- Users can preview the result in real time.
+- Added error handling for invalid input and output parameters.
+
+# Tags are comma separated with spaces allowed
+tags=ROI, threshold, histogram, raster, teledetection
+
+category=Raster Analysis
+icon=icon/icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
+# Since QGIS 3.8, a comma separated list of plugins to be installed
+# (or upgraded) can be specified.
+# Check the documentation for more information.
+
+Category of the plugin: Raster, Vector, Database or Web
+category=Raster
+
+# If the plugin can run on QGIS Server.
+server=False
+
