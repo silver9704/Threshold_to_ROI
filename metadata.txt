@@ -6,7 +6,7 @@
 name=Threshold to ROI
 qgisMinimumVersion=3.8
 description=Create ROI (Region of Interest) with threshold values.
-version=1.0
+version=0.9.0
 author=Silver Piedra
 email=silverpiedraherrera@gmail.com
 
@@ -19,15 +19,16 @@ repository=https://github.com/silver9704/Threshold_to_ROI.git
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=0.9.0
-- Easy and intuitive user interface implementation.
-- Users can preview the result in real time.
-- Added error handling for invalid input and output parameters.
+changelog=
+	0.9.0
+	- Easy and intuitive user interface implementation.
+	- Users can preview the result in real time.
+	- Added error handling for invalid input and output parameters.
 
 # Tags are comma separated with spaces allowed
 tags=ROI, threshold, histogram, raster, teledetection
 
-category=Raster Analysis
+category=Raster
 icon=icon/icon.png
 # experimental flag
 experimental=False
@@ -40,7 +41,7 @@ deprecated=False
 # Check the documentation for more information.
 
 Category of the plugin: Raster, Vector, Database or Web
-category=Raster
+# category=Raster
 
 # If the plugin can run on QGIS Server.
 server=False
