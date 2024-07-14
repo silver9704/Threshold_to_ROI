@@ -12,8 +12,8 @@ email=silverpiedraherrera@gmail.com
 
 about=This plugin allows you to create an ROI (Region of Interest) with selected threshold values ​​from the histogram of a raster layer.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/silver9704/Threshold_to_ROI/issues
+repository=https://github.com/silver9704/Threshold_to_ROI.git
 # End of mandatory metadata
 
 # Recommended items:
