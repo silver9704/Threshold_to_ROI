@@ -16,27 +16,27 @@ Threshold to ROI is a QGIS plugin that helps you create a Region of Interest (RO
 2. Click on the Threshold to ROI button in the toolbar.
 3. In the plugin dialog, select the raster layer and the desired band.
 
-![load](https://drive.google.com/file/d/1wKWCTEmNI5gMvZXEwqvRQzMNlzlmM9Z3/view?usp=drive_link)
+![load](https://drive.google.com/uc?export=view&id=1wKWCTEmNI5gMvZXEwqvRQzMNlzlmM9Z3)
 
 4. You can select a color that will be used for the output layer settings.
 
-![color](https://drive.google.com/file/d/1XdehElXP7lnZ4tajW9WQQoJPYJQC0y5E/view?usp=drive_link)
+![color](https://drive.google.com/uc?export=view&id=1XdehElXP7lnZ4tajW9WQQoJPYJQC0y5E)
 
 5. Use the histogram to set the minimum and maximum threshold values. Click on the "histogram" button and a window with the histogram of the raster layer will open.
 
-![histogram](https://drive.google.com/file/d/1SWYyWY6zpuoKXzntUT1Owm3-lnFj8DXt/view?usp=drive_link)
+![histogram](https://drive.google.com/uc?export=view&id=1SWYyWY6zpuoKXzntUT1Owm3-lnFj8DXt)
 
 6. Use the color span to select the range of threshold values. If you want to see a preview of the ROI, click on the "Preview" checkbox, a preview layer will load and update in real time when you move the color span.
 
-![preview](https://drive.google.com/file/d/1zPob5iUAknEEbrqAFifC2yEYz4grZXqH/view?usp=drive_link)
+https://github.com/user-attachments/assets/cd41ef8e-d5a9-4153-a9c2-e64b40e6fe6f
 
 7. Select the path for the output raster layer.
 
-![output_path](https://drive.google.com/file/d/1zPob5iUAknEEbrqAFifC2yEYz4grZXqH/view?usp=drive_link)
+![output_path](https://drive.google.com/uc?export=view&id=1zPob5iUAknEEbrqAFifC2yEYz4grZXqH)
 
 8. Finally click accept to create the ROI raster layer. This layer will be automatically loaded into the project.
 
-![result](https://drive.google.com/file/d/1CoEWsYLtMAIngZcqubu8z-2y2mJB8Ibb/view?usp=drive_link)
+![result](https://drive.google.com/uc?export=view&id=1CoEWsYLtMAIngZcqubu8z-2y2mJB8Ibb)
 
 ## License
 
