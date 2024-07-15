@@ -40,7 +40,7 @@ https://github.com/user-attachments/assets/cd41ef8e-d5a9-4153-a9c2-e64b40e6fe6f
 
 ## License
 
-This plugin is licensed under the GNU General Public License v2.0 or later.
+This plugin is licensed under the GNU General Public License v3.0.
 
 ## Contribution
 
