@@ -63,8 +63,15 @@ class HistogramPlot(QDialog):
         self.iface = iface
         self.tr = tr
         self.setWindowTitle(self.tr('Histogram'))
-        self.setFixedHeight(400)
-        self.setFixedWidth(450)
+        # Get screem geometry
+        scream_geometry = QApplication.desktop().availableGeometry()
+        scream_width = scream_geometry.width()
+        scream_height = scream_geometry.height()
+        x, y = int(scream_width * 0.1), int(scream_height * 0.3)
+        # Set windown geometry
+        self.setGeometry(x, y, 450, 400)
+        self.setMinimumSize(450, 400)
+        # Attributes
         self.layer = layer
         self.band = band
         self.color = color

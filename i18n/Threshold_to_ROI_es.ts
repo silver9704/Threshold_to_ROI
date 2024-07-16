@@ -27,17 +27,17 @@
         <translation>Histograma</translation>
     </message>
     <message>
-        <location filename="../gui/histogram.py" line="90"/>
+        <location filename="../gui/histogram.py" line="97"/>
         <source>Min. Value:</source>
         <translation>Valor Min.:</translation>
     </message>
     <message>
-        <location filename="../gui/histogram.py" line="96"/>
+        <location filename="../gui/histogram.py" line="103"/>
         <source>Max. Value:</source>
         <translation>Valor Max.:</translation>
     </message>
     <message>
-        <location filename="../gui/histogram.py" line="111"/>
+        <location filename="../gui/histogram.py" line="118"/>
         <source>Preview</source>
         <translation>Previsualizar</translation>
     </message>
@@ -96,47 +96,47 @@
         <translation>Threshold a ROI</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="27"/>
+        <location filename="../gui/main.py" line="34"/>
         <source>Raster layer:</source>
         <translation>Capa ráster:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="35"/>
+        <location filename="../gui/main.py" line="42"/>
         <source>Band:</source>
         <translation>Banda:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="43"/>
+        <location filename="../gui/main.py" line="50"/>
         <source>Output raster:</source>
         <translation>Ráster de salida:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="46"/>
+        <location filename="../gui/main.py" line="53"/>
         <source>GeoTIFF files (*.tif)</source>
         <translation>Archivos GeoTIFF (*.tif)</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="50"/>
+        <location filename="../gui/main.py" line="57"/>
         <source>Color:</source>
         <translation>Color:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="68"/>
+        <location filename="../gui/main.py" line="75"/>
         <source>Histogram</source>
         <translation>Histograma</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="72"/>
+        <location filename="../gui/main.py" line="79"/>
         <source>Min. value:</source>
         <translation>Valor Min.:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="75"/>
+        <location filename="../gui/main.py" line="82"/>
         <source>Max. Value:</source>
         <translation>Valor Max.:</translation>
     </message>
     <message>
-        <location filename="../gui/main.py" line="90"/>
+        <location filename="../gui/main.py" line="97"/>
         <source>Threshold</source>
         <translation>Umbral</translation>
     </message>

@@ -16,8 +16,15 @@ class ThresholdRoiGui(QDialog):
         super().__init__()
         self.tr = tr
         self.setWindowTitle(self.tr('Threshold to ROI'))
-        self.setFixedWidth(400)
-        self.setFixedHeight(220)
+        # Get screem geometry
+        screem_geometry = QApplication.desktop().availableGeometry()
+        screem_width = screem_geometry.width()
+        screem_height = screem_geometry.height()
+        x, y = int(screem_width * 0.15), int(screem_height * 0.2)
+        # Set windown geometry
+        self.setGeometry(x, y, 400, 220)
+        self.setFixedSize(400, 220)
+        # Set default color
         self.default_color = QColor(255, 0, 0)
 
     def setupUi(self):
