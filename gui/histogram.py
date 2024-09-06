@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout
 from qgis.gui import QgsMapLayerComboBox, QgsRasterBandComboBox, QgsColorButton, QgsFileWidget
 from qgis.core import (QgsMapLayerProxyModel, QgsRasterHistogram, QgsRasterLayer, QgsColorRampShader, QgsRasterShader,
                        QgsSingleBandPseudoColorRenderer, QgsProject, Qgis)
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import Qt, pyqtSignal, QTimer
 from qgis.PyQt.QtGui import QColor, QDoubleValidator
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
@@ -16,6 +16,9 @@ import numpy as np
 
 
 class HistogramCanvas(FigureCanvasQTAgg):
+    # Span signal
+    span_changed = pyqtSignal(float, float)
+
     def __init__(self, frequency, bins, x_min, x_max, color_span, tr):
         self.frequency = frequency
         self.bins = bins
@@ -43,50 +46,56 @@ class HistogramCanvas(FigureCanvasQTAgg):
         self.ax.set_ylabel(self.tr('Frequency'), fontsize=9)
 
         # Span selector
-        self.span = SpanSelector(self.ax, self.on_select, direction='horizontal', useblit=True, interactive=True,
-                                 props=dict(alpha=0.5, facecolor=self.color_span), onmove_callback=self.on_move)
+        self.span = SpanSelector(self.ax, onselect=self.on_select, direction='horizontal', useblit=True,
+                                 props=dict(alpha=0.5, facecolor=self.color_span), interactive=True,
+                                 onmove_callback=self.on_move)
 
     # Internal methods
     def on_select(self, x_min, x_max):
-        self.parent().on_select(x_min, x_max)
+        self.span_changed.emit(x_min, x_max)
 
     def on_move(self, x_min, x_max):
-        self.parent().on_move(x_min, x_max)
+        self.span_changed.emit(x_min, x_max)
 
-    def span_update(self, x_min, x_max):
+    # Public method
+    def update_span(self, x_min, x_max):
         self.span.extents = (x_min, x_max)
 
 
 class HistogramPlot(QDialog):
-    def __init__(self, iface, tr, layer, band, color):
-        super().__init__()
+    def __init__(self, iface, tr, provider, band, min_value, max_value, color, parent=None):
+        super().__init__(parent)
         self.iface = iface
         self.tr = tr
         self.setWindowTitle(self.tr('Histogram'))
         # Get screem geometry
-        scream_geometry = QApplication.desktop().availableGeometry()
-        scream_width = scream_geometry.width()
-        scream_height = scream_geometry.height()
-        x, y = int(scream_width * 0.1), int(scream_height * 0.3)
-        # Set windown geometry
+        screen_geometry = QApplication.desktop().availableGeometry()
+        screen_width = screen_geometry.width()
+        screen_height = screen_geometry.height()
+        x, y = int(screen_width * 0.1), int(screen_height * 0.3)
+        # Set window geometry
         self.setGeometry(x, y, 450, 400)
         self.setMinimumSize(450, 400)
         # Attributes
-        self.layer = layer
+        self.provider = provider
         self.band = band
+        self.min_value = min_value
+        self.max_value = max_value
         self.color = color
         self.preview_layer = None
+        # Timer for debouncing
+        self.update_timer = QTimer()
+        self.update_timer.setInterval(180)
+        # Create canvas
         self.create_canvas()
 
     def create_canvas(self):
         # Matplotlib canvas
-        provider = self.layer.dataProvider()
-        bins = int(np.ceil(np.sqrt(provider.xSize() * provider.ySize())))
-        histogram = provider.histogram(self.band, bins)
-        self.min_value = provider.bandStatistics(self.band).minimumValue
-        self.max_value = provider.bandStatistics(self.band).maximumValue
+        bins = int(np.ceil(np.sqrt(self.provider.xSize() * self.provider.ySize())))
+        histogram = self.provider.histogram(self.band, bins)
         self.canvas = HistogramCanvas(frequency=histogram.histogramVector, bins=bins, x_min=self.min_value,
                                       x_max=self.max_value, color_span=self.color.name(), tr=self.tr)
+        self.canvas.span_changed.connect(self.update_min_max)
         self.setupUI()
 
     def setupUI(self):
@@ -100,13 +109,13 @@ class HistogramPlot(QDialog):
         self.min_value_edit = QLineEdit()
         self.min_value_edit.setValidator(validator)
         self.min_value_edit.setText(str(self.min_value))
-        self.min_value_edit.textChanged.connect(self.canvas_span_update)
+        self.min_value_edit.textChanged.connect(self.update_canvas_span)
         max_value_label = QLabel(self.tr('Max. Value:'))
         max_value_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.max_value_edit = QLineEdit()
         self.max_value_edit.setValidator(validator)
         self.max_value_edit.setText(str(self.max_value))
-        self.max_value_edit.textChanged.connect(self.canvas_span_update)
+        self.max_value_edit.textChanged.connect(self.update_canvas_span)
 
         # Min-Max layout
         min_max_layout = QHBoxLayout()
@@ -135,24 +144,21 @@ class HistogramPlot(QDialog):
         layout.addLayout(lower_layout)
         self.setLayout(layout)
 
-        self.canvas_span_update()
+        self.update_canvas_span()
 
     # Internals methods
-    def canvas_span_update(self):
+    def update_canvas_span(self):
         # Function that updates the canvas span
         try:
             x_min = float(self.min_value_edit.text())
             x_max = float(self.max_value_edit.text())
-            self.canvas.span_update(x_min, x_max)
+            self.canvas.update_span(x_min, x_max)
         except ValueError:
             pass  # Ignore invalid values in QLineEdit
 
-    def on_select(self, x_min, x_max):
-        # Function that updates the text edit
-        self.min_value_edit.setText(str(x_min))
-        self.max_value_edit.setText(str(x_max))
+        self.update_timer.start()
 
-    def on_move(self, x_min, x_max):
+    def update_min_max(self, x_min, x_max):
         # Function that updates the text edit
         self.min_value_edit.setText(str(x_min))
         self.max_value_edit.setText(str(x_max))
@@ -169,7 +175,7 @@ class HistogramPlot(QDialog):
                 self.hide_preview_layer(False)
 
     def create_preview_layer(self):
-        self.preview_layer = QgsRasterLayer(self.layer.source(), 'roi_preview')
+        self.preview_layer = QgsRasterLayer(self.provider.dataSourceUri(), 'roi_preview')
         QgsProject.instance().addMapLayer(self.preview_layer)
 
         # Move the layer to the top
@@ -178,11 +184,47 @@ class HistogramPlot(QDialog):
         root.insertChildNode(0, layer_node.clone())
         root.removeChildNode(layer_node)
 
-        # connect new signals
-        self.min_value_edit.textChanged.connect(self.update_preview_layer)
-        self.max_value_edit.textChanged.connect(self.update_preview_layer)
+        # Render settings
+        self.fnc = QgsColorRampShader()
+        self.fnc.setColorRampType(QgsColorRampShader.Discrete)
+        self.fnc.setClassificationMode(QgsColorRampShader.Quantile)
 
+        shader = QgsRasterShader()
+        shader.setRasterShaderFunction(self.fnc)
+
+        renderer = QgsSingleBandPseudoColorRenderer(self.preview_layer.dataProvider(), self.band, shader)
+        self.preview_layer.setRenderer(renderer)
+
+        # Update preview layer
         self.update_preview_layer()
+
+        # connect new signal
+        self.update_timer.timeout.connect(self.update_preview_layer)
+
+    def update_preview_layer(self):
+        # Function that updates the preview layer in real time
+        x_min = max(float(self.min_value_edit.text()), self.min_value)
+        x_max = min(float(self.max_value_edit.text()), self.max_value)
+
+        # Preview layer color setting
+        if x_min == self.min_value and x_max != self.max_value:
+            color_list = [QgsColorRampShader.ColorRampItem(x_max, self.color),
+                          QgsColorRampShader.ColorRampItem(np.inf, Qt.transparent)]
+
+        elif x_min != self.min_value and x_max == self.max_value:
+            color_list = [QgsColorRampShader.ColorRampItem(x_min, Qt.transparent),
+                          QgsColorRampShader.ColorRampItem(np.inf, self.color)]
+
+        elif x_min == self.min_value and x_max == self.max_value:
+            color_list = [QgsColorRampShader.ColorRampItem(np.inf, self.color)]
+
+        else:
+            color_list = [QgsColorRampShader.ColorRampItem(x_min, Qt.transparent),
+                          QgsColorRampShader.ColorRampItem(x_max,  self.color),
+                          QgsColorRampShader.ColorRampItem(np.inf, Qt.transparent)]
+
+        self.fnc.setColorRampItemList(color_list)
+        self.preview_layer.triggerRepaint()
 
     def hide_preview_layer(self, visible):
         # Function that handles the visibility of the preview layer
@@ -191,60 +233,20 @@ class HistogramPlot(QDialog):
         if layer_node is not None:
             layer_node.setItemVisibilityChecked(visible)
 
-    def update_preview_layer(self):
-        # Function that updates the preview layer in real time
-        fnc = QgsColorRampShader()
-        fnc.setColorRampType(QgsColorRampShader.Discrete)
-        fnc.setClassificationMode(QgsColorRampShader.Quantile)
-
-        x1 = float(self.min_value_edit.text())
-        x2 = float(self.max_value_edit.text())
-        color_list = self.color_list(x1, x2)
-
-        fnc.setColorRampItemList(color_list)
-
-        shader = QgsRasterShader()
-        shader.setRasterShaderFunction(fnc)
-
-        renderer = QgsSingleBandPseudoColorRenderer(self.preview_layer.dataProvider(), self.band, shader)
-
-        self.preview_layer.setRenderer(renderer)
-        self.preview_layer.triggerRepaint()
-
-    def color_list(self, x1, x2):
-        # Preview layer color setting function
-        x_min = max(x1, self.min_value)
-        x_max = min(x2, self.max_value)
-
-        if x_min == self.min_value and x_max != self.max_value:
-            list_ = [QgsColorRampShader.ColorRampItem(x_max, self.color),
-                     QgsColorRampShader.ColorRampItem(np.inf, Qt.transparent)]
-
-        elif x_min != self.min_value and x_max == self.max_value:
-            list_ = [QgsColorRampShader.ColorRampItem(x_min, Qt.transparent),
-                     QgsColorRampShader.ColorRampItem(np.inf, self.color)]
-
-        elif x_min == self.min_value and x_max == self.max_value:
-            list_ = [QgsColorRampShader.ColorRampItem(np.inf, self.color)]
-
-        else:
-            list_ = [QgsColorRampShader.ColorRampItem(x_min, Qt.transparent),
-                     QgsColorRampShader.ColorRampItem(x_max,  self.color),
-                     QgsColorRampShader.ColorRampItem(np.inf, Qt.transparent)]
-
-        return list_
-
     def cleanup_preview_layer(self):
         # Function that removes the preview layer
         if self.preview_layer is not None:
             QgsProject.instance().removeMapLayer(self.preview_layer.id())
+            self.preview_layer = None
             self.iface.mapCanvas().refresh()
 
     def accept(self):
+        self.update_timer.stop()
         self.cleanup_preview_layer()
         super().accept()
 
     def reject(self):
+        self.update_timer.stop()
         self.cleanup_preview_layer()
         super().reject()
 

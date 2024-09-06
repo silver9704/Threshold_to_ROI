@@ -6,7 +6,7 @@
 name=Threshold to ROI
 qgisMinimumVersion=3.8
 description=Create ROI (Region of Interest) with threshold values.
-version=0.9.1
+version=0.9.2
 author=Silver Piedra
 email=silverpiedraherrera@gmail.com
 
@@ -29,6 +29,11 @@ changelog=
 	0.9.1
 	- The default position of the dialog windows was modified.
 	- The raster histogram window can now be resized.
+
+	0.9.2
+	- Now the result is a boolean raster.
+	- Better optimized code.
+	- Some bugs were fixed.
 
 # Tags are comma separated with spaces allowed
 tags=ROI, threshold, histogram, raster, teledetection

@@ -88,31 +88,30 @@ class ThresholdROIPlugin:
     def run(self):
         if self.first_start:
             self.first_start = False
-            self.window = ThresholdRoiDialog(iface=self.iface, tr=self.tr)
+            self.window = ThresholdRoiDialog(iface=self.iface, tr=self.tr, parent=self.iface.mainWindow())
+            self.window.accepted.connect(self.accepted_dialog)
         else:
             self.window.clear_content()
 
-        while True:
-            result = self.window.exec_()
+        self.window.show()
 
-            if not result:
-                break
+    def accepted_dialog(self):
+        # Handling invalid parameters
+        valid_path = self.window.valid_path()
+        valid_min_max = self.window.valid_min_max()
 
-            # Handling invalid parameters
-            valid_path = self.window.valid_path()
-            valid_min_max = self.window.valid_min_max()
+        if not valid_path:
+            QMessageBox.warning(self.window, self.tr('Warning'), self.tr('Please select an valid output path.'),
+                                buttons=QMessageBox.Ok)
+            self.window.show()
+            return
 
-            if not valid_path:
-                QMessageBox.warning(self.window, self.tr('Warning'), self.tr('Please select an valid output path.'),
-                                    buttons=QMessageBox.Ok)
-                continue
+        if not valid_min_max:
+            QMessageBox.warning(self.window, self.tr('Warning'),
+                                self.tr('Please select the minimum and maximum values.'),
+                                buttons=QMessageBox.Ok)
+            self.window.show()
+            return
 
-            if not valid_min_max:
-                QMessageBox.warning(self.window, self.tr('Warning'),
-                                    self.tr('Please select the minimum and maximum values.'),
-                                    buttons=QMessageBox.Ok)
-                continue
-
-            # Calculation execution
-            self.window.calculate()
-            break
+        # Calculation execution
+        self.window.calculate()

@@ -1,5 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/plugins/Threshold_to_ROI">
-    <file>icon/icon.png</file>
-</qresource>
-</RCC>

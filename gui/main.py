@@ -12,20 +12,21 @@ import numpy as np
 
 class ThresholdRoiGui(QDialog):
 
-    def __init__(self, tr):
-        super().__init__()
+    def __init__(self, tr, parent=None):
+        super().__init__(parent)
         self.tr = tr
         self.setWindowTitle(self.tr('Threshold to ROI'))
         # Get screem geometry
-        screem_geometry = QApplication.desktop().availableGeometry()
-        screem_width = screem_geometry.width()
-        screem_height = screem_geometry.height()
-        x, y = int(screem_width * 0.15), int(screem_height * 0.2)
-        # Set windown geometry
+        screen_geometry = QApplication.desktop().availableGeometry()
+        screen_width = screen_geometry.width()
+        screen_height = screen_geometry.height()
+        x, y = int(screen_width * 0.15), int(screen_height * 0.2)
+        # Set window geometry
         self.setGeometry(x, y, 400, 220)
         self.setFixedSize(400, 220)
         # Set default color
         self.default_color = QColor(255, 0, 0)
+        self.setupUi()
 
     def setupUi(self):
         # Main layout
@@ -36,8 +37,6 @@ class ThresholdRoiGui(QDialog):
         raster_layer_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.raster_layer_cbox = QgsMapLayerComboBox()
         self.raster_layer_cbox.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.raster_layer_cbox.layerChanged.connect(self.updateBand)
-        self.raster_layer_cbox.layerChanged.connect(self.clean_min_max)
 
         # Raster band
         raster_band_label = QLabel(self.tr('Band:'))
@@ -45,7 +44,6 @@ class ThresholdRoiGui(QDialog):
         self.raster_band_cbox = QgsRasterBandComboBox()
         self.raster_band_cbox.setFixedWidth(80)
         self.raster_band_cbox.setLayer(self.raster_layer_cbox.currentLayer())
-        self.raster_band_cbox.bandChanged.connect(self.clean_min_max)
 
         # Output ROI
         output_label = QLabel(self.tr('Output raster:'))
@@ -111,14 +109,6 @@ class ThresholdRoiGui(QDialog):
         layout.addSpacing(10)
         layout.addWidget(buttons_box)
         self.setLayout(layout)
-
-    # Internal methods
-    def updateBand(self):
-        self.raster_band_cbox.setLayer(self.raster_layer_cbox.currentLayer())
-
-    def clean_min_max(self):
-        self.min_edit.clear()
-        self.max_edit.clear()
 
     # Public methods
     def getLayer(self):
